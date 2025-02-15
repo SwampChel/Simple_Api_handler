@@ -1,42 +1,52 @@
 package main
 
 import (
+	"ApiHandler/Database"
+	"ApiHandler/TaskServise"
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
-var task string
+func GetMessages(w http.ResponseWriter, r *http.Request) {
 
-type requestBody struct {
-	Message string `json:"message"`
+	var tasks []TaskServise.Task
+
+	if err := Database.DB.Find(&tasks).Error; err != nil { // cоздаем запись в базе
+		http.Error(w, "Fail", http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json") //явно указываем формат json
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tasks) //кодируем в формат json
 }
 
-func GetHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "oh hi, %s", task)
-}
+func CreateMessage(w http.ResponseWriter, r *http.Request) {
 
-func PostHandler(w http.ResponseWriter, r *http.Request) {
-	var body requestBody
+	var task TaskServise.Task
 
-	// Декодируем json из тела запроса в структуру
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		http.Error(w, "It's Over", http.StatusBadRequest)
 		return
 	}
-	// если ключ json соответствует то все хорошо приравниваем запрос к task
-	task = body.Message
-
+	if err := Database.DB.Create(&task).Error; err != nil { //Извлекаем
+		http.Error(w, "It's UberOver ", http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json") //явно указываем формат json
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "Are you winning son ?")
+	json.NewEncoder(w).Encode(task) // кодируем в формат json
 }
 
 func main() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/hello", GetHandler).Methods("GET")
-	router.HandleFunc("/api/post", PostHandler).Methods("POST")
+	Database.InitDB()
+
+	Database.DB.AutoMigrate(&TaskServise.Task{})
+
+	router.HandleFunc("/api/task", GetMessages).Methods("GET")
+	router.HandleFunc("/api/task", CreateMessage).Methods("POST")
 
 	http.ListenAndServe(":8080", router)
 }
