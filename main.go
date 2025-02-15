@@ -12,7 +12,7 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 
 	var tasks []TaskServise.Task
 
-	if err := Database.DB.Find(&tasks).Error; err != nil { // cоздаем запись в базе
+	if err := Database.DB.Find(&tasks).Error; err != nil { // извлекаем
 		http.Error(w, "Fail", http.StatusBadRequest)
 		return
 	}
@@ -29,7 +29,7 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "It's Over", http.StatusBadRequest)
 		return
 	}
-	if err := Database.DB.Create(&task).Error; err != nil { //Извлекаем
+	if err := Database.DB.Create(&task).Error; err != nil { // cоздаем запись в базе
 		http.Error(w, "It's UberOver ", http.StatusBadRequest)
 		return
 	}
