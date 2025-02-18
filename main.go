@@ -53,14 +53,14 @@ func PatchHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "Invalid task ID", http.StatusBadRequest)
+		http.Error(w, "you are invalid ", http.StatusBadRequest)
 		return
 	}
 
 	// Ищем по ID в бд (поиск по первичному  ключу так как используем gorm.Model)
 	var task TaskServise.Task
-	result := Database.DB.First(&task, id)
-	if result.Error != nil {
+	newTask := Database.DB.First(&task, id)
+	if newTask.Error != nil {
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
 	}
@@ -74,8 +74,8 @@ func PatchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Обновляем Task декодированным запросом помещенным в мапу
-	result = Database.DB.Model(&task).Updates(update)
-	if result.Error != nil {
+	newTask = Database.DB.Model(&task).Updates(update)
+	if newTask.Error != nil {
 		http.Error(w, "Failed to update task", http.StatusInternalServerError)
 		return
 	}
@@ -97,15 +97,15 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Ищем задачу по ID
 	var task TaskServise.Task
-	result := Database.DB.First(&task, id)
-	if result.Error != nil {
+	delTask := Database.DB.First(&task, id)
+	if delTask.Error != nil {
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
 	}
 
 	// Удаляем задачу
-	result = Database.DB.Delete(&task)
-	if result.Error != nil {
+	delTask = Database.DB.Delete(&task)
+	if delTask.Error != nil {
 		http.Error(w, "Failed to delete task", http.StatusInternalServerError)
 		return
 	}
