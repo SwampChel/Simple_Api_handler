@@ -50,22 +50,17 @@ func PatchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// ID из URL
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+	idVars := mux.Vars(r)
+	id, err := strconv.Atoi(idVars["id"])
 	if err != nil {
 		http.Error(w, "you are invalid ", http.StatusBadRequest)
 		return
 	}
 
-	// Ищем по ID в бд (поиск по первичному  ключу так как используем gorm.Model)
 	var task TaskServise.Task
-	newTask := Database.DB.First(&task, id)
-	if newTask.Error != nil {
-		http.Error(w, "Task not found", http.StatusNotFound)
-		return
-	}
 
 	// Декодируем тело запроса в мапу
+
 	var update map[string]interface{}
 	err = json.NewDecoder(r.Body).Decode(&update)
 	if err != nil {
@@ -74,7 +69,7 @@ func PatchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Обновляем Task декодированным запросом помещенным в мапу
-	newTask = Database.DB.Model(&task).Updates(update)
+	newTask := Database.DB.Model(&task).Where("id = ?", id).Updates(update)
 	if newTask.Error != nil {
 		http.Error(w, "Failed to update task", http.StatusInternalServerError)
 		return
@@ -88,23 +83,18 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// ID из URL
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+	idVars := mux.Vars(r)
+	id, err := strconv.Atoi(idVars["id"])
 	if err != nil {
 		http.Error(w, "Invalid task ID", http.StatusBadRequest)
 		return
 	}
 
-	// Ищем задачу по ID
-	var task TaskServise.Task
-	delTask := Database.DB.First(&task, id)
-	if delTask.Error != nil {
-		http.Error(w, "Task not found", http.StatusNotFound)
-		return
-	}
-
 	// Удаляем задачу
-	delTask = Database.DB.Delete(&task)
+
+	var task TaskServise.Task
+
+	delTask := Database.DB.Delete(&task, id)
 	if delTask.Error != nil {
 		http.Error(w, "Failed to delete task", http.StatusInternalServerError)
 		return
