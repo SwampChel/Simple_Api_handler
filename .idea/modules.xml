@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ApiHandler.iml" filepath="$PROJECT_DIR$/.idea/ApiHandler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/pet_project_1_etap.iml" filepath="$PROJECT_DIR$/.idea/pet_project_1_etap.iml" />
     </modules>
   </component>
 </project>

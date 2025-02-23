@@ -1,4 +1,4 @@
-module ApiHandler
+module pet_project_1_etap
 
 go 1.23
 
