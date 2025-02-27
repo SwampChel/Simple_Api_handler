@@ -57,47 +57,39 @@ func (h *Handler) PostTasks(_ context.Context, request tasks.PostTasksRequestObj
 	return response, nil
 }
 func (h *Handler) DeleteTasksId(ctx context.Context, request tasks.DeleteTasksIdRequestObject) (tasks.DeleteTasksIdResponseObject, error) {
-	// Получаем ID задачи из запроса
+
 	taskID := request.Id
 
-	// Вызываем метод сервиса для удаления задачи
 	err := h.Service.DeleteTaskByID(taskID)
 	if err != nil {
-		// Если произошла ошибка, возвращаем её
+
 		return nil, err
 	}
 	response := tasks.DeleteTasksId204Response{}
-	// Возвращаем успешный ответ (204 No Content)
+
 	return response, nil
 }
 
 func (h *Handler) PatchTasksId(ctx context.Context, request tasks.PatchTasksIdRequestObject) (tasks.PatchTasksIdResponseObject, error) {
-	// Получаем ID задачи из запроса
+
 	taskID := request.Id
 
-	// Получаем данные для обновления из тела запроса
 	taskRequest := request.Body
 
-	// Создаём структуру задачи для обновления
 	taskToUpdate := taskService.Task{
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
 	}
 
-	// Вызываем метод сервиса для обновления задачи
 	updatedTask, err := h.Service.UpdateTaskByID(taskID, taskToUpdate)
 	if err != nil {
-		// Если произошла ошибка, возвращаем её
 		return nil, err
 	}
 
-	// Создаём структуру ответа
 	response := tasks.PatchTasksId200JSONResponse{
 		Id:     &updatedTask.ID,
 		Task:   &updatedTask.Task,
 		IsDone: &updatedTask.IsDone,
 	}
-
-	// Возвращаем обновлённую задачу
 	return response, nil
 }
