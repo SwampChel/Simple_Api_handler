@@ -4,11 +4,8 @@ import "gorm.io/gorm"
 
 type TaskRepository interface {
 	CreateTask(task Task) (Task, error)
-
 	GetAllTasks() ([]Task, error)
-
 	UpdateTaskByID(id uint, task Task) (Task, error)
-
 	DeleteTaskByID(id uint) error
 }
 

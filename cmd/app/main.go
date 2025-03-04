@@ -14,7 +14,7 @@ import (
 
 func main() {
 	database.InitDB()
-	err := database.DB.AutoMigrate(&taskService.Task{})
+	err := database.DB.AutoMigrate(&taskService.Task{}, &userService.User{})
 	if err != nil {
 		return
 	}
@@ -22,11 +22,10 @@ func main() {
 	tasksRepo := taskService.NewTaskRepository(database.DB)
 	tasksService := taskService.NewService(tasksRepo)
 
-	TasksHandler := handlers.NewHandler(tasksService)
-
 	usersRepo := userService.NewUserRepository(database.DB)
 	usersService := userService.NewUserService(usersRepo)
 
+	TasksHandler := handlers.NewHandler(tasksService, usersService)
 	UsersHandler := handlers.NewUserHandlers(usersService)
 
 	e := echo.New()
